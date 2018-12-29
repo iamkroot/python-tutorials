@@ -68,7 +68,7 @@ $ python downloader.py
 
 This doesn't do anything, as our script is nearly empty :P.
 
-But the `argparse` does have some built-in defaults. It adds the help message, and gives an error for unrecognized arguments (which is everything except `help`, by default).
+But the `argparse` does have some built-in defaults. It adds the help message, and gives an error for unrecognized arguments (which is everything except `help` for now).
 ```bash
 $ python downloader.py --help
 usage: downloader.py [-h]
@@ -83,6 +83,7 @@ usage: downloader.py [-h]
 downloader.py: error: unrecognized arguments: foo
 ```
 
+#### Positional arguments
 Next, we allow the user to enter the link to the video they want to download.
 ```python
 import argparse
@@ -110,7 +111,7 @@ usage: downloader.py [-h] link
 downloader.py: error: the following arguments are required: link
 ```
 
-##### Optional Arguments
+#### Optional Arguments
 A typical scenario that arises in command line scripts, is sometimes, we want the program to display minimal information when it is running, and other times, we want a relatively detailed information of each step. For example, normally, you would just specify the video link and run our downloader, and a progress bar of the download is shown. But suppose we want more information, like the exact download url, the audio/video quality, etc, so as to make it more "verbose".
 
 To specify this type of behaviour, the user can enter optional arguments, also called as flags, which modify the script a little, instead of serving as main inputs.
@@ -140,7 +141,7 @@ optional arguments:
 $ python downloader.py --verbosity 1 https://link/to/video
 Verbose mode
 ```
-###### Short Options
+#### Short Options
 Most command line apps have a simpler way to specify optional arguments, mentioning the argument with only one or two letters. Here's how to do that in argparse:
 ```python
 parser.add_argument('-v', '--verbosity', help="specify output verbosity")
@@ -151,7 +152,7 @@ $ python downloader.py -v 1 https://link/to/video
 Verbose mode
 ```
 (P.S. If you have been paying attention, you would notice that the `--help` option also has the short option `-h`.)
-#### Moving forward
+### Moving forward
 Now that we know how to take positional arguments and optional arguments, we can explore some more features provided by the `argparse` library.
 
 #### Limiting choices for options
@@ -182,7 +183,7 @@ optional arguments:
                         specify output verbosity
   --quality {1080p,720p,480p}
                         specify video quality
-$ python downloader.py -q 240p /path/to/vid -v 1
+$ python downloader.py -q 240p https://path/to/vid -v 1
 usage: downloader.py [-h] [-v VERBOSITY] [-q {1080p,720p,480p}] link
 downloader.py: error: argument -q/--quality: invalid choice: '240p' (choose from '1080p', '720p', '480p')
 ```
@@ -222,10 +223,28 @@ We can even have more values for the required parameter. For example, we can all
 parser.add_argument('links', nargs='+', help="download videos from given links")
 ```
 Notice the `nargs='+'` parameter. The `'+'` means that there at be any number of values for the given argument(`link` in this case), but if no argument is provided, it will generate an error. The result will be stored in a `list`.
+```
+$ python downloader.py --help
+usage: downloader.py [-h] [-v VERBOSITY] [-q {1080p,720p,480p}]
+                     [-t {1 .. 31}]
+                     links [links ...]
+
+positional arguments:
+  links                 download videos from links
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v VERBOSITY, --verbosity VERBOSITY
+                        specify output verbosity
+  -q {1080p,720p,480p}, --quality {1080p,720p,480p}
+                        specify video quality
+  -t {1 .. 31}, --threads {1 .. 31}
+                        number of threads for downloading
+```
 Other possible values for `nargs` are:
 1) `N` (an integer): `N` arguments from the command line will be gathered together into a list.
 2) `'?'`: If an argument is given, it will be used, otherwise `default` will be used. Remember this as *either one or zero*.
-3) `'*'`: Same as `?`, but doesn't generate an error if argument is not given. Remember as *zero or more*.
+3) `'*'`: Same as `+`, but doesn't generate an error if argument is not given. Remember as *zero or more*.
 4) `argparse.REMAINDER`: ALL the remaining command-line arguments are gathered into a list. Not very useful for us.
 ### More POWER!!
 What we have seen till now barely scratches the surface of the powerful, yet flexible `argparse` library. For advanced use cases, from handling conflicting options, to using a custom `Formatter`, you can refer to the official [docs](https://docs.python.org/3/library/argparse.html) for a comprehensive reference.
